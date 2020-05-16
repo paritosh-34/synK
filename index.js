@@ -1,8 +1,8 @@
 const fs = require("fs");
 const readline = require("readline");
 
-async function processLineByLine(a, b, c, d) {
-  const fileStream = fs.createReadStream("test2.srt");
+async function processLineByLine(path, a, b, c, d) {
+  const fileStream = fs.createReadStream(path);
   const writeStream = fs.createWriteStream("output.srt");
 
   const rl = readline.createInterface({
@@ -25,12 +25,24 @@ async function processLineByLine(a, b, c, d) {
         
         s = s + ~~(ms / 1000);
         ms = ms - 1000 * ~~(ms / 1000);
+        if (ms < 0) {
+          ms += 1000;
+          s--;
+        }
 
         m = m + ~~(s / 60);
         s = s - 60 * ~~(s / 60);
-        
+        if (s < 0) {
+          s += 60;
+          m--;
+        }
+
         hr = hr + ~~(m / 60);
         m = m - 60 * ~~(m / 60);
+        if (m < 0) {
+          m += 60;
+          hr--;
+        }
 
         hr = String(hr);
         m = String(m);
@@ -58,7 +70,9 @@ function run(t) {
   let m = ~~(t / 60000);
   const s = ~~(t / 1000 - 60 * m);
   const ms = t % 1000;
-  processLineByLine(0, m, s, ms);
+
+  console.log(m, s);
+  processLineByLine("test.srt", 0, m, s, ms);
 }
 
-run(7007);
+run(-92000);
